@@ -27,6 +27,8 @@ namespace JewelryShop.Domain
         [Required]
         public decimal Price { get; set; }
         public decimal Discount { get; set; }
+        [Required]
+        public string Material { get; set; }
         public virtual IEnumerable<Order> Orders { get; set; } = new List<Order>();
 
 
