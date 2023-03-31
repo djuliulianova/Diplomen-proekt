@@ -1,4 +1,3 @@
-using JewelryShop.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JewelryShop.Data;
+using JewelryShop.Domain;
+using JewelryShop.Services;
+using JewelryShop.Abstraction;
+using JewelryShop.Infrasructure;
 
 namespace JewelryShop
 {
@@ -27,14 +31,29 @@ namespace JewelryShop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDatabaseDeveloperPageExceptionFilter();
+            //  services.AddDbContext<ApplicationDbContext>(options =>
+            //   options.UseSqlServer(
+            //      Configuration.GetConnectionString("DefaultConnection")));
+            // services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+            //     .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseLazyLoadingProxies()
+            .UseSqlServer(
+                Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+            services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<ICategoryService, CategoryService>();
+            services.AddTransient<IBrandService, BrandService>();
+           
+
             services.AddControllersWithViews();
+            services.AddRazorPages();
             services.Configure<IdentityOptions>(option =>
             {
                 option.Password.RequireDigit = false;
@@ -43,7 +62,6 @@ namespace JewelryShop
                 option.Password.RequireNonAlphanumeric = false;
                 option.Password.RequireUppercase = false;
                 option.Password.RequiredUniqueChars = 0;
-
             }
             );
         }
@@ -51,6 +69,7 @@ namespace JewelryShop
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.PrepareDatabase();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

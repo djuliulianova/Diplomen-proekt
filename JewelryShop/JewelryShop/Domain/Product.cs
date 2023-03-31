@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,7 +26,12 @@ namespace JewelryShop.Domain
 
         public int Quantity { get; set; }
         [Required]
+        [Range(0, 10000)]
+        //[Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
+        [Required]
+        [Range(0, 10000)]
+        //[Column(TypeName = "decimal(18,2)")]
         public decimal Discount { get; set; }
         [Required]
         public string Material { get; set; }
